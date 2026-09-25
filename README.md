@@ -1,4 +1,4 @@
-# Simin Yuan
+# 可复现的证据，能被证伪的预测
 
 **独立研究者。做可被验证的事，并公开我被验证错了的部分。**
 
@@ -80,3 +80,7 @@ Works: [precheck](https://github.com/simin-yuan/precheck) ·
 [self-auditing-agent](https://github.com/simin-yuan/self-auditing-agent) ·
 [context-volume-not-coupling](https://github.com/simin-yuan/context-volume-not-coupling) ·
 [shiqing-predictions](https://github.com/simin-yuan/shiqing-predictions)
+
+---
+
+— Simin Yuan
