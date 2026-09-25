@@ -18,6 +18,7 @@
 
 - 仓库内 demo 实跑：`replicas: 3 -> 0`，检查照样 `exit 0`
 - 19 个单测、零依赖、纯标准库、不联网；三系统 × Python 3.8–3.13 CI 全绿（9/9）
+- 已上 PyPI：`pip install precheck`（v0.1.1）
 - 自带 GitHub Action
 
 ### 2. [`greencheck`](https://github.com/simin-yuan/greencheck) — 专查质量门禁的变异测试工具
