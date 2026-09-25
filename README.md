@@ -7,9 +7,20 @@
 
 ---
 
-## 三个作品
+## 四个作品
 
-### 1. [`self-auditing-agent`](https://github.com/simin-yuan/self-auditing-agent) — 一个会自我审计的 AI
+### 1. [`greencheck`](https://github.com/simin-yuan/greencheck) — 专查质量门禁的变异测试工具
+
+> 删掉 schema 里一行，三个主流校验器都不吭声了 —— 而且它吐出来的任何输出都不会告诉你。
+
+`pip install greencheck`，零依赖、纯标准库。它在你的配置和 schema 上自动制造小改动
+（删一行、把值清空、把数字改成 0），然后问你的门禁还拦不拦得住。
+
+- 本机实测 3/3：同一份非法数据，`jsonschema` / `check-jsonschema` / `ajv` 从 `exit 1` 变成 `exit 0`
+- 唯一一条规则：**一个数字，只有在「已知输入不同」的条件下被观察到取过不同的值，它才是一个测量**
+- 输出明说「这些是问题、不是结论」—— 不拿变异数冒充缺陷数
+
+### 2. [`self-auditing-agent`](https://github.com/simin-yuan/self-auditing-agent) — 一个会自我审计的 AI
 
 > 别的 AI 在证明自己能干活。这个 AI 在证明自己**能被查**。
 
@@ -20,12 +31,12 @@
 - 含对抗性发现（原实现安全缺口）、4 个自己的 bug、1 个假发现、1 次误报
 - 核心发现**一条命令可复现**：`python repro/verify_sql_gap.py`
 
-### 2. [`context-volume-not-coupling`](https://github.com/simin-yuan/context-volume-not-coupling) — 受控实验
+### 3. [`context-volume-not-coupling`](https://github.com/simin-yuan/context-volume-not-coupling) — 受控实验
 
 *Volume or Coupling? A Scale-Dependent Dissociation in Constraint Recovery of Language-Model Loops*
 语言模型自指循环中约束恢复的尺度依赖性解离。预印本 DOI: [10.5281/zenodo.21200851](https://doi.org/10.5281/zenodo.21200851)
 
-### 3. [`shiqing-predictions`](https://github.com/simin-yuan/shiqing-predictions) — 公开预测账本
+### 4. [`shiqing-predictions`](https://github.com/simin-yuan/shiqing-predictions) — 公开预测账本
 
 署名 AI、发布前入链、到期公开结算、**MISS 永久保留**。
 不是"展示准确率"，是把**可证伪性**当作一条不可绕开的纪律。
@@ -52,6 +63,7 @@ Independent researcher. I ship **reproducible evidence** and **falsifiable predi
 
 **You don't judge an AI by what it gets right — you judge it by whether it lets you check what it got wrong.**
 
-Works: [self-auditing-agent](https://github.com/simin-yuan/self-auditing-agent) ·
+Works: [greencheck](https://github.com/simin-yuan/greencheck) ·
+[self-auditing-agent](https://github.com/simin-yuan/self-auditing-agent) ·
 [context-volume-not-coupling](https://github.com/simin-yuan/context-volume-not-coupling) ·
 [shiqing-predictions](https://github.com/simin-yuan/shiqing-predictions)
