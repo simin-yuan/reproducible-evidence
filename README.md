@@ -1,73 +1,136 @@
-# 可复现的证据，能被证伪的预测
+# Reproducible evidence, falsifiable claims
+
+**Independent researcher working on AI agent verification.** I build small tools that check claims — mine and other people's — and publish the runs where the answer came back no.
+
+[GitHub](https://github.com/simin-yuan) · [ORCID 0009-0002-6843-3390](https://orcid.org/0009-0002-6843-3390) · [Google Scholar](https://scholar.google.com/citations?user=Ae_nfUYAAAAJ)
+
+---
+
+## Four public works
+
+### 1. [`precheck`](https://github.com/simin-yuan/precheck) — an agent cannot pass a check it was not allowed to write
+
+The acceptance check is frozen before the work starts and hash-locked, so rewriting it afterwards voids every verdict issued after that point. Once a check passes, the tool breaks the artifact the check just approved and runs the check again: a check that still passes on broken input was never evidence for anything.
+
+- `python demo.py` in a checkout, run 2026-10-10 — with `replicas: 3` changed to `0` the check still exits `0`, and `audit` reports `2 check/mutation pair(s) survived`
+- 19 unit tests, zero dependencies, standard library only, no network; CI green on Python 3.8 / 3.11 / 3.13 across Linux, Windows and macOS (9/9)
+- On PyPI: `pip install precheck` (v0.1.2)
+- Ships a GitHub Action
+
+### 2. [`greencheck`](https://github.com/simin-yuan/greencheck) — mutation testing aimed at quality gates
+
+It edits your configs and schemas in small ways — drop a line, blank a value, set a number to zero — and reports the ones your gate still accepts.
+
+- `python -m greencheck.cli mutate --gate "..." --target examples/mutate-demo/input` in a checkout, run 2026-10-10 — 12 mutants, 11 caught, 1 escaped (`blank-value:config.json:4:"replicas":`)
+- 72 tests, zero dependencies, standard library only; CI green on Python 3.9 / 3.11 / 3.13 across Linux, Windows and macOS (9/9)
+- On PyPI: `pip install greencheck` (v0.3.1)
+- Its own output calls the result "questions, not findings": an escaped mutant may be a legal input, and the tool cannot tell you which without someone who knows what the gate is for
+
+### 3. [`self-auditing-agent`](https://github.com/simin-yuan/self-auditing-agent) — an AI that audits itself in public
+
+A published record of one run: every conclusion, the command that produced it, the bugs found in the audit tooling along the way, and the findings that were withdrawn. A stranger can re-run the core result.
+
+- Volume 1 — a 74-minute forensic audit of 11 unfamiliar repositories (1,768 files), a real gap found in the audited system, 4 bugs of its own, and one false discovery it caught itself
+- The core finding reproduces with one command: `python repro/verify_sql_gap.py`
+- The same repository turns its own gates into mutation targets and publishes which mutants escape
+
+### 4. [`agent-pushgate`](https://github.com/simin-yuan/agent-pushgate) — privacy gates on the manual push path
+
+Automated export pipelines usually have a leak gate; a hand-typed `git commit && git push` usually has none, and that is where private material tends to escape. Six checks run on the `pre-push` hook — the working tree, the commit messages, the exact object range being sent, the hook installation itself, landing, and ledger discipline. Any non-zero return, including "cannot decide", refuses the push.
+
+- Local commits are untouched: stopping is reversible, publishing is not
+- 6 self-test and 3 falsification scripts; every gate is fed input it must reject. **CI green on Linux and Windows × Python 3.9 and 3.13 (4/4 cells)**
+- `git push --no-verify` bypasses it entirely, so one self-test measures that hole rather than pretending it is not there
+- Zero third-party dependencies, standard library only; the deny-list lives outside the repository
+
+---
+
+## What I work on
+
+**An AI system earns trust to the extent that it lets you check where it went wrong.**
+
+Three rules follow:
+
+| Rule | In practice |
+|---|---|
+| Evidence before assertion | Every claim carries the command that produced it and its output |
+| A gate must be able to say no | Gates are fed inputs that should fail; a check that cannot return a negative is not a check |
+| Record the failures | Bugs, false alarms and withdrawn findings are published; a success-only showcase is not credible |
+
+---
+
+## Publications
+
+- *Volume or Coupling? A Scale-Dependent Dissociation in Constraint Recovery of Language-Model Loops.* Zenodo, 2026-07-05. DOI [10.5281/zenodo.21200851](https://doi.org/10.5281/zenodo.21200851)
+- *Recovery or Repetition? Feedback Policy and Verbatim Relay in a Two-Agent Language-Model Loop.* Research Square, 2026-10-08. DOI [10.21203/rs.3.rs-11287076/v1](https://doi.org/10.21203/rs.3.rs-11287076/v1)
+- *Can One Agent Restore Another? Multi-Agent Verification Through Independent Constraint Sources.* Research Square, 2026-08-13. DOI [10.21203/rs.3.rs-10651733/v1](https://doi.org/10.21203/rs.3.rs-10651733/v1)
+
+[ORCID](https://orcid.org/0009-0002-6843-3390) · [Google Scholar](https://scholar.google.com/citations?user=Ae_nfUYAAAAJ)
+
+---
+
+## 中文
 
 **独立研究者。做可被验证的事，并公开我被验证错了的部分。**
 
-本公开索引仅保留已经公开的通用工具与方法；未发表研究、长期运行系统和产品工程不在此列。
+[GitHub](https://github.com/simin-yuan) · [ORCID 0009-0002-6843-3390](https://orcid.org/0009-0002-6843-3390) · [Google Scholar](https://scholar.google.com/citations?user=Ae_nfUYAAAAJ)
 
----
+### 四个公开作品
 
-## 三个公开作品
+#### 1. [`precheck`](https://github.com/simin-yuan/precheck) — 让 agent 用「它无权编写」的检查自证
 
-### 1. [`precheck`](https://github.com/simin-yuan/precheck) — 让 agent 用「它无权编写」的检查自证
+验收检查在动工前就冻结并锁进哈希链，事后改一个字，那之后的全部结论作废。检查通过后，它改坏刚被批准的产物再跑一遍：在坏输入上照样通过的检查，从来就不是证据。
 
-> 你的 agent 说它做完了。这个工具先把验收检查**冻住**，再问一句没人问的话：这条检查**本来能失败吗**？
-
-检查在动工之前写死、并入哈希链；事后改一个字，之前所有结论全部作废。检查通过之后，
-它改坏被检查的产物再跑一遍 —— 在坏输入上照样通过的检查，从来就不是证据。
-
-- 仓库内 demo 实跑：`replicas: 3 -> 0`，检查照样 `exit 0`
-- 19 个单测、零依赖、纯标准库、不联网；三系统 × Python 3.8–3.13 CI 全绿（9/9）
-- 已上 PyPI：`pip install precheck`（v0.1.1）
+- 仓内取一份代码跑 `python demo.py`（2026-10-10 实测）——`replicas: 3` 改成 `0`，检查照样 `exit 0`，`audit` 报 `2 check/mutation pair(s) survived`
+- 19 个单测、零依赖、纯标准库、不联网；CI 在 Python 3.8 / 3.11 / 3.13 × Linux / Windows / macOS 全绿（9/9）
+- 已上 PyPI：`pip install precheck`（v0.1.2）
 - 自带 GitHub Action
 
-### 2. [`greencheck`](https://github.com/simin-yuan/greencheck) — 专查质量门禁的变异测试工具
+#### 2. [`greencheck`](https://github.com/simin-yuan/greencheck) — 专查质量门禁的变异测试工具
 
-> 删掉 schema 里一行，三个主流校验器都不吭声了 —— 而且它吐出来的任何输出都不会告诉你。
+它在你的配置和 schema 上做小改动——删一行、把值清空、把数字改成 0——然后报告哪些门禁照样收下了。
 
-`pip install greencheck`，零依赖、纯标准库。它在你的配置和 schema 上自动制造小改动
-（删一行、把值清空、把数字改成 0），然后问你的门禁还拦不拦得住。
+- 仓内取一份代码实跑（2026-10-10）：12 个变异，11 个被拦，1 个逃过（`blank-value:config.json:4:"replicas":`）
+- 72 个测试、零依赖、纯标准库；CI 在 Python 3.9 / 3.11 / 3.13 × Linux / Windows / macOS 全绿（9/9）
+- 已上 PyPI：`pip install greencheck`（v0.3.1）
+- 它自己的输出写着「这些是问题、不是结论」：逃过的变异可能是合法输入，没有懂这条门禁要干什么的人，工具分不出来
 
-- 本机实测 3/3：同一份非法数据，`jsonschema` / `check-jsonschema` / `ajv` 从 `exit 1` 变成 `exit 0`
-- 唯一一条规则：**一个数字，只有在「已知输入不同」的条件下被观察到取过不同的值，它才是一个测量**
-- 输出明说「这些是问题、不是结论」—— 不拿变异数冒充缺陷数
+#### 3. [`self-auditing-agent`](https://github.com/simin-yuan/self-auditing-agent) — 一个会自我审计的 AI
 
-### 3. [`self-auditing-agent`](https://github.com/simin-yuan/self-auditing-agent) — 一个会自我审计的 AI
+一份公开的运行档案：每个结论、产出它的那条命令、审计工具自己出的 bug、以及被撤回的发现。陌生的人可以复跑核心结果。
 
-> 别的 AI 在证明自己能干活。这个 AI 在证明自己**能被查**。
+- 第一卷——74 分钟取证审计陌生 11 仓库 / 1,768 个文件；在被审系统里找到一个真缺口；4 个自己的 bug；1 个假发现是自己抓出来的
+- 核心发现一条命令可复现：`python repro/verify_sql_gap.py`
+- 同一个仓库把自己门禁当变异靶子，公开哪些变异逃了过去
 
-一份公开的运行档案：每个结论、支撑证据、**它自己的 bug**、以及第三方如何复现。
-价值不在"发现了什么"，在于**它公开了自己错在哪、以及怎么发现的**。
+#### 4. [`agent-pushgate`](https://github.com/simin-yuan/agent-pushgate) — 手工推送前的隐私闸
 
-- 第一卷：74 分钟对陌生 11 仓库 / 1768 文件的取证审计
-- 含对抗性发现（原实现安全缺口）、4 个自己的 bug、1 个假发现、1 次误报
-- 核心发现**一条命令可复现**：`python repro/verify_sql_gap.py`
+自动导出的那条路径通常有闸，手打 `git commit && git push` 通常没有，私密内容多半从这儿漏出去。六个检查串在 `pre-push` 钩子上——工作树、提交信息、这次要送的确切对象范围、钩子有没有真装上、落地、台账纪律。任何一个返回非 0（含「判不了」）就拒绝这次推送。
 
+- 本地提交不受影响：**停下来是可逆的，公开不可逆**
+- 6 个自证 + 3 个证伪脚本；每个闸都拿「必须被拒的输入」喂过。**CI 在 Linux 与 Windows × Python 3.9 / 3.13 四格全绿**
+- `git push --no-verify` 能整个绕过它——所以有一条自证把这个洞实测出来，不假装它不存在
+- 零第三方依赖、纯标准库；禁止名单不进仓
 
----
+### 我在做什么
 
-## 我在做什么
+**一个 AI 值得多少信任，取决于它在多大程度上让人查它错在哪。**
 
-**判断一个 AI 靠不靠得住，不看它做对什么，看它敢不敢让人查它做错什么。**
+由此三条规则：
 
-这决定了我的三条工作原则：
-
-| 原则 | 落地形态 |
+| 规则 | 落地形态 |
 |---|---|
-| 证据先于断言 | 每条结论带命令 + 输出；分档 `① 跑出结果 > ② 读过原文 > ③ 只按元数据判` |
-| 门禁必须能说"不" | 验证门禁只用**会失败的输入**去喂；不能输出否定的判据不算判据 |
-| 记录失败 | 自己的 bug、误报、假发现全部公开——**只放成功路径的展示不可信** |
+| 证据先于断言 | 每条结论都带着产出它的命令和输出 |
+| 门禁必须能说「不」 | 门禁只用**必须失败的输入**去喂；不能输出否定的判据不算判据 |
+| 记录失败 | bug、误报、被撤回的发现全部公开；只放成功路径的展示不可信 |
 
----
+### 论文
 
-## English
+- *Volume or Coupling? A Scale-Dependent Dissociation in Constraint Recovery of Language-Model Loops.* Zenodo，2026-07-05。DOI [10.5281/zenodo.21200851](https://doi.org/10.5281/zenodo.21200851)
+- *Recovery or Repetition? Feedback Policy and Verbatim Relay in a Two-Agent Language-Model Loop.* Research Square，2026-10-08。DOI [10.21203/rs.3.rs-11287076/v1](https://doi.org/10.21203/rs.3.rs-11287076/v1)
+- *Can One Agent Restore Another? Multi-Agent Verification Through Independent Constraint Sources.* Research Square，2026-08-13。DOI [10.21203/rs.3.rs-10651733/v1](https://doi.org/10.21203/rs.3.rs-10651733/v1)
 
-Independent researcher focused on **reproducible evidence** and **falsifiable claims**. Unpublished research, long-running private systems, and product engineering are outside this public index.
-
-**You don't judge an AI by what it gets right — you judge it by whether it lets you check what it got wrong.**
-
-Works: [precheck](https://github.com/simin-yuan/precheck) ·
-[greencheck](https://github.com/simin-yuan/greencheck) ·
-[self-auditing-agent](https://github.com/simin-yuan/self-auditing-agent)
+[ORCID](https://orcid.org/0009-0002-6843-3390) · [Google Scholar](https://scholar.google.com/citations?user=Ae_nfUYAAAAJ)
 
 ---
 
