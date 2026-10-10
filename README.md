@@ -6,7 +6,7 @@
 
 ---
 
-## Four public works
+## Five public works
 
 ### 1. [`precheck`](https://github.com/simin-yuan/precheck) — an agent cannot pass a check it was not allowed to write
 
@@ -43,6 +43,16 @@ Automated export pipelines usually have a leak gate; a hand-typed `git commit &&
 - `git push --no-verify` bypasses it entirely, so one self-test measures that hole rather than pretending it is not there
 - Zero third-party dependencies, standard library only; the deny-list lives outside the repository
 
+### 5. [`retrieval-abstention-bench`](https://github.com/simin-yuan/retrieval-abstention-bench) — can a retrieval layer tell when the answer is not in the corpus?
+
+Four question sets over four public-domain novels: one answerable, three unanswerable by construction. The false ones are built by swapping an entity anchor for a real entity that sits far away in the text, and whether they are genuinely unanswerable is checked numerically instead of asserted — a hand-written negative set only covers the cases its author imagined.
+
+- `python bench/cli.py verify` in a checkout, run 2026-10-11 — 14 self-checks and 7 falsification cases, 33 s, exit 0; an oracle retriever drives the metric to 1.000 and a retriever that returns nothing drives it to 0.000
+- Headline cell, a zero-dependency BM25 retriever: declines 3.3% of the answerable questions and 86.0% of the unanswerable ones — 82.7 points apart, 95% CI 77.7 to 87.3
+- No LLM, no network, no API key, standard library only; the exam is frozen with a sha256, and `verify` fails if a recorded threshold no longer matches the code
+- One criterion is easier than it should be on the cross-book tier (AUC 0.634 against 0.520 on the same-book tier), because the swapped anchor occurs nowhere in the target book at all; the headline rests on the criterion that has no such shortcut
+- CI green on Python 3.9 and 3.12
+
 ---
 
 ## What I work on
@@ -75,7 +85,7 @@ Three rules follow:
 
 [GitHub](https://github.com/simin-yuan) · [ORCID 0009-0002-6843-3390](https://orcid.org/0009-0002-6843-3390) · [Google Scholar](https://scholar.google.com/citations?user=Ae_nfUYAAAAJ)
 
-### 四个公开作品
+### 五个公开作品
 
 #### 1. [`precheck`](https://github.com/simin-yuan/precheck) — 让 agent 用「它无权编写」的检查自证
 
@@ -111,6 +121,16 @@ Three rules follow:
 - 6 个自证 + 3 个证伪脚本；每个闸都拿「必须被拒的输入」喂过。**CI 在 Linux 与 Windows × Python 3.9 / 3.13 四格全绿**
 - `git push --no-verify` 能整个绕过它——所以有一条自证把这个洞实测出来，不假装它不存在
 - 零第三方依赖、纯标准库；禁止名单不进仓
+
+#### 5. [`retrieval-abstention-bench`](https://github.com/simin-yuan/retrieval-abstention-bench) — 检索层知不知道「库里根本没有答案」
+
+四部公有领域小说、四套题：一套可答，三套**构造性不可答**。假题的做法是把实体锚点换成一个真实但离得很远的实体，它到底可不可答由距离规则**算出来**，不是拍脑袋断言——手写的负样本只能覆盖作者想得到的那几个。
+
+- 仓内取一份代码跑 `python bench/cli.py verify`（2026-10-11 实测）——14 项自检 + 7 条证伪，33 秒，exit 0；oracle 检索器把指标顶到 1.000，空检索器把它压到 0.000
+- 头条格（零依赖 BM25）：可答题弃答 3.3%，不可答题弃答 86.0%——相差 82.7 个百分点，95% CI 77.7 ~ 87.3
+- 不用 LLM、不联网、不要 API key、纯标准库；考试封了 sha256，`verify` 发现记录的阈值与代码不符就报红
+- 有一条判据在跨书档上比它该有的更容易（AUC 0.634，同书档 0.520），因为换过去的锚点在目标书里完全不出现；头条压在没这条捷径的判据上
+- CI 在 Python 3.9 / 3.12 全绿
 
 ### 我在做什么
 
