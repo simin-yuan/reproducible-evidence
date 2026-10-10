@@ -30,7 +30,7 @@ It edits your configs and schemas in small ways — drop a line, blank a value, 
 
 A published record of one run: every conclusion, the command that produced it, the bugs found in the audit tooling along the way, and the findings that were withdrawn. A stranger can re-run the core result.
 
-- Volume 1 — a 74-minute forensic audit of 11 unfamiliar repositories (1,768 files), a real gap found in the audited system, 4 bugs of its own, and one false discovery it caught itself
+- Volume 1 — a 74-minute forensic audit of an unfamiliar third-party system, a real gap found in it (the vulnerable pattern is reproduced offline in the repo), 4 bugs of its own, and one false discovery it caught itself
 - The core finding reproduces with one command: `python repro/verify_sql_gap.py`
 - The same repository turns its own gates into mutation targets and publishes which mutants escape
 
@@ -99,7 +99,7 @@ Three rules follow:
 
 一份公开的运行档案：每个结论、产出它的那条命令、审计工具自己出的 bug、以及被撤回的发现。陌生的人可以复跑核心结果。
 
-- 第一卷——74 分钟取证审计陌生 11 仓库 / 1,768 个文件；在被审系统里找到一个真缺口；4 个自己的 bug；1 个假发现是自己抓出来的
+- 第一卷——74 分钟取证审计一个陌生第三方系统；在它里面找到一个真缺口（漏洞模式已在仓库里离线复现）；4 个自己的 bug；1 个假发现是自己抓出来的
 - 核心发现一条命令可复现：`python repro/verify_sql_gap.py`
 - 同一个仓库把自己门禁当变异靶子，公开哪些变异逃了过去
 
